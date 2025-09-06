@@ -480,6 +480,8 @@ namespace FirewallCore
         
         /// <summary>
         /// One client connection: decide TLS vs plaintext, then loop on lines.
+        /// Need to re-work client command connection as old server has been scrapped for change
+        /// Local command execution should work fine as an alternative if enabled
         /// </summary>
         private async Task HandleClientAsync(TcpClient client, CancellationToken token)
         {
@@ -519,7 +521,7 @@ namespace FirewallCore
                         command = _crypto.Decrypt(command);
                     }
 
-                    // run your router
+                    // Will re-work this later.
                     CommandManager.ProcessCommand(command, this, out var result);
 
                     if (!string.IsNullOrEmpty(result))
@@ -623,11 +625,11 @@ namespace FirewallCore
         
         /// <summary>
         /// Very simple parser stub: return true if this line represents an "attempt" for IP.
-        /// Replace this with your real pattern matching or syslog parsing.
+        /// Existing pattern for use as other methods don't work correctly with intended output.
         /// </summary>
-        public bool TryParseConnectionAttempt(string line, out string ip)
+        private bool TryParseConnectionAttempt(string line, out string ip)
         {
-            // e.g. if log lines look like "ATTEMPT src=1.2.3.4", etc.
+            // Log lines work with logger set value matched with IP tables expected ruleset
             const string tag = "ATTEMPT src=";
             if (line.StartsWith(tag, StringComparison.OrdinalIgnoreCase))
             {
